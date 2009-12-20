@@ -1,0 +1,12 @@
+Everything is an object.
+
+objects are cloned, like in io.
+
+z := Object : clone;
+x := Int : clone;
+x = 3; /* reinitizalize x */
+x + 3;
+
+[x > 0] ifTrue 3
+
+z : m a b -> a * b; /* define a new method called m, which takes two parameters, a and b */
