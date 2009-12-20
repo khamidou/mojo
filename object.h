@@ -21,9 +21,12 @@ enum {
 */
 
 struct Method {
-	struct Object *arg1, *arg2;
+	char *name;
+	struct Object *parent;
+	struct Object * (*c_method)(struct Object *arg1, struct Object *arg2); 
+	
 	TAILQ_ENTRY(Method) methods;
-	Object * (*c_method)(arg1, arg2); 
+
 };
 
 struct Object {
