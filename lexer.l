@@ -6,8 +6,8 @@
 
 %%
 
-[:alnum:]+	{ return SYMBOL;	}
-[:digit:]+	{ return NUMBER; 	}
-\"[:alnum:]+\"  { return STRING;	}
 
-<<EOF>>		{ return EOF;		}
+[0-9]+	{ return NUMBER; 	}
+\"[:alnum:]+\"  { return STRING;	}
+[:alnum:]+	{ return SYMBOL;	}
+<<EOF>>		{ return T_EOF;		}
