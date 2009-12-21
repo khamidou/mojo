@@ -40,6 +40,7 @@ struct Object {
 	union {
 		int i_value;
 		char c_value;
+		struct mojo_list *l_value;
 	} value;
 
 	TAILQ_HEAD(Methods_head, Method) methods_head;
@@ -60,5 +61,7 @@ void init_object_system(void);
 struct Object *nil_object;
 struct Object *base_object;
 struct Object *number_object;
+struct Object *list_object;
+
 
 #endif

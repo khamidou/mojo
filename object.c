@@ -135,4 +135,11 @@ void init_object_system(void)
 	number_object->name = "Number";
 	number_object->value.i_value = 0;
 	add_method(number_object, &Plus_method, "+");
+
+	/* init list object */
+	list_object = new_object();
+	list_object->super = base_object;
+	list_object->type = T_LIST;
+	list_object->name = "List";
+
 }

@@ -1,1 +1,6 @@
 mojo is a smalltalk without smalltalk.
+
+Coding conventions
+==================
+
+All the names beginning with mojo_ are internal.
