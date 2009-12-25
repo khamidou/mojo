@@ -50,7 +50,24 @@ struct Object* clone_object(struct Object *o)
 		list_append(new->methods, met);
 	}
 
+	switch(o->type) {
+	case T_NUMBER:
+		new->value.i_value = o->value.i_value;
+		break;
 
+	case T_LIST:
+		for (i = 0; i < list_length(o); i++) {
+			struct Object *t = clone_object((struct Object *) list_nth(o, i));
+			
+			if (t == NULL)
+				fail("Unable to clone list at %d %d",  __FILE__, __LINE__);
+
+			list_append(new, t);
+		}
+		break;
+
+		
+	}
 	return new;
 }
 
