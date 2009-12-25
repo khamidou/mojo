@@ -4,7 +4,10 @@
 #include "queue.h"
 #include "zalloc.h"
 
-
+/*
+  The types :
+  Note that a block is actually a list that is gonna be interpreted in a different environment.
+*/
 enum o_types {
 	T_NIL,
 	T_BOOL,
@@ -12,25 +15,10 @@ enum o_types {
 	T_LIST,
 	T_STRING,
 	T_OBJECT, 
+	T_BUILTIN,
 	T_BLOCK,
+
 }; /* the base types */
-
-/*
-  A method is actually a function pointer.
-  What about methods defined in mojo ?
-  for instance, 3 square ?
-  where square is defined as : : square -> self * self;
-  On a un handler par défaut qui appelle les sous-methodes et retourne le résultat.
-*/
-
-struct Method {
-	char *name;
-	struct Object *parent;
-	struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2); 
-	
-	TAILQ_ENTRY(Method) methods;
-
-};
 
 struct Object {
 	struct Object *super;
@@ -40,13 +28,15 @@ struct Object {
 	union {
 		int i_value;
 		char c_value;
+		struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2); 
 		struct mojo_list *l_value;
+		struct Object *m_block;
 	} value;
 
-	TAILQ_HEAD(Methods_head, Method) methods_head;
+	struct Object *methods; /* A list object */
 };
 
-struct Method *lookup_method(struct Object *o, char *name);
+struct Object *lookup_method(struct Object *o, char *name);
 struct Object *new_object(void);
 struct Object *clone_object(struct Object *o);
 void free_object(struct Object *o);

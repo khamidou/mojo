@@ -5,7 +5,7 @@
 #include "queue.h"
 
 struct mojo_list_elem {
-	Object *obj;
+	struct Object *obj;
 	TAILQ_ENTRY(mojo_list_elem) mojo_lists;
 };
 
@@ -14,9 +14,10 @@ struct mojo_list {
 };
 
 struct mojo_list* list_init(void);
-void list_append(struct Object *list, struct Object *o);
-void list_remove(struct Object *list, struct Object *o);
+struct Object* list_append(struct Object *list, struct Object *o);
+struct Object* list_remove(struct Object *list);
 struct Object* list_nth(struct Object *list, int n);
 struct Object* list_last(struct Object *list);
+struct Object* create_list_object(void);
 
 #endif

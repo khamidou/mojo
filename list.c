@@ -1,7 +1,8 @@
 #include "list.h"
+#include "error.h"
 #include "zalloc.h"
 
-struct mojo_list* list_init(void)
+struct mojo_list* mojo_list_init(void)
 {
 	struct mojo_list *l = zalloc(sizeof(struct mojo_list));
 	TAILQ_INIT(&l->mojo_list_head);
@@ -9,20 +10,20 @@ struct mojo_list* list_init(void)
 	return l;
 }
 
-void list_append(struct Object *list, struct Object *o)
+void mojo_list_append(struct mojo_list *list, struct Object *o)
 {
-	if (list == NULL || o == NULL || list->type != T_LIST)
+	if (list == NULL || o == NULL)
 		return;
 
-	struct list_elem *e = zalloc(sizeof(struct list_elem));
+	struct mojo_list_elem *e = zalloc(sizeof(struct mojo_list_elem));
 	e->obj = o;
 
 	TAILQ_INSERT_TAIL(&list->mojo_list_head, e, mojo_lists);
 }
 
-void list_remove(struct Object * list, struct Object *o)
+void mojo_list_remove(struct mojo_list* list)
 {
-	struct list_elem *e = TAILQ_LAST(&list->mojo_list_head, mojo_lists);
+	struct mojo_list_elem *e = TAILQ_LAST(&list->mojo_list_head, Lists_head);
 	TAILQ_REMOVE(&list->mojo_list_head, e, mojo_lists);
 	
 	/* Also free the associated object : */
@@ -30,39 +31,179 @@ void list_remove(struct Object * list, struct Object *o)
 	free(e);
 }
 
-struct Object* list_nth(struct Object *list, int n)
+struct Object* mojo_list_nth(struct mojo_list *list, int n)
 {
 	if (list == NULL)
 		return NULL;
 
-	struct Object *o = TAILQ_FIRST(&list->mojo_list_head);
+	struct mojo_list_elem *e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head);
 	int i = 0;
 	
-	for (i = 0; i < n && o != NULL; i++) {
-		o = TAILQ_NEXT(o);
+	for (i = 0; i < n && TAILQ_NEXT(e, mojo_lists) != NULL; i++) {
+		e = TAILQ_NEXT(e, mojo_lists);
 	}
 
-	return o;
-}
-
-struct Object* list_last(struct Object *list)
-{
-	struct list_elem *e = TAILQ_LAST(&mojo_list_head, lists);
 	return e->obj;
 }
 
+struct Object* mojo_list_last(struct mojo_list *list)
+{
+	if (list == NULL)
+		return NULL;
+
+	struct mojo_list_elem *e = TAILQ_LAST(&list->mojo_list_head, Lists_head);
+	return e->obj;
+}
+
+int mojo_list_length(struct mojo_list *list)
+{
+	if (list == NULL)
+		return -1;
+
+	struct mojo_list_elem *e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head);
+	int i = 0;
+	
+	for (i = 0; TAILQ_NEXT(e, mojo_lists) != NULL; i++) {
+		e = TAILQ_NEXT(e, mojo_lists);
+	}
+
+	return i;
+	
+}
 /*
   Here begins the public facing list api.
 
  */
 
-struct Object* create_list(void)
+struct Object* create_list_object(void)
 {
-	/* init base object */
-	struct Object *list_object
-	base_object = new_object();
-	base_object->super = nil_object;
-	base_object->type = T_OBJECT;
-	base_object->name = "Object";
+	/* init base object - this needs to be called only once*/
+	/* the rest of the time, this object is cloned */
 
+	/* We can't use new_object because it calls create_list recursively */
+	list_object = (struct Object *) zalloc(sizeof(struct Object));
+
+	if (list_object == NULL)
+		error("Unable to create list object");
+
+	list_object->super = nil_object;
+	list_object->type = T_LIST;
+	list_object->name = "List";
+	list_object->value.l_value = mojo_list_init();
+
+	/* Create a second list object that contains the methods of the list object */
+	struct Object *l1 = (struct Object *) zalloc(sizeof(struct Object));
+
+	if (list_object == NULL)
+		error("Unable to create list object");
+
+	l1->super = nil_object;
+	l1->type = T_LIST;
+	l1->name = "List";
+	l1->value.l_value = mojo_list_init();
+	
+	struct Object *met = zalloc(sizeof(struct Object));
+	if (met == NULL)
+		fail("Unable to create a method %d %d", __FILE__, __LINE__);
+
+	met->type = T_BUILTIN;
+	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
+						   struct Object *arg2))list_append;
+	list_append(l1, met);
+
+	met = zalloc(sizeof(struct Object));
+	if (met == NULL)
+		fail("Unable to create a method %d %d", __FILE__, __LINE__);
+
+	met->type = T_BUILTIN;
+	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
+						   struct Object *arg2))list_remove;
+	list_append(l1, met);
+	
+	met = zalloc(sizeof(struct Object));
+	if (met == NULL)
+		fail("Unable to create a method %d %d", __FILE__, __LINE__);
+
+	met->type = T_BUILTIN;
+	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
+						   struct Object *arg2))list_nth;
+	list_append(l1, met);
+
+	met = zalloc(sizeof(struct Object));
+	if (met == NULL)
+		fail("Unable to create a method %d %d", __FILE__, __LINE__);
+
+	met->type = T_BUILTIN;
+	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
+						   struct Object *arg2))list_last;
+	list_append(l1, met);
+
+	/* TODO: add the builtin methods to the list object */
+}
+
+struct Object* list_append(struct Object *list, struct Object *o)
+{
+	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+		return nil_object;
+
+	if (o == NULL)
+		return NULL;
+
+	mojo_list_append(list->value.l_value, o);
+
+	return o;
+}
+
+struct Object* list_remove(struct Object *list)
+{
+	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+		return nil_object;
+
+	mojo_list_remove(list->value.l_value);
+
+	return nil_object;
+}
+
+struct Object* list_nth(struct Object *list, int n)
+{
+	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+		return nil_object;
+
+	struct Object *o = mojo_list_nth(list->value.l_value, n);
+
+	if (o != NULL)
+		return o;
+	else
+		return nil_object;
+
+}
+
+
+struct Object* list_last(struct Object *list)
+{
+	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+		return nil_object;
+
+	struct Object *o = mojo_list_last(list->value.l_value);
+
+	if (o != NULL)
+		return o;
+	else
+		return nil_object;
+	
+}
+
+struct Object* list_length(struct Object *list)
+{
+	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+		return nil_object;
+
+	
+	struct Object *o = clone_object(number_object);
+	if (o == NULL)
+		fail("Unable to clone number_object : %d %d", __FILE__, __LINE__);
+
+	o->value.i_value =  mojo_list_length(list->value.l_value);
+
+	return o;
 }
