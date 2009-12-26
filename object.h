@@ -26,7 +26,7 @@ struct Object {
 	enum o_types type;
 
 	union {
-		int i_value;
+		signed int i_value;
 		char c_value;
 		struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2); 
 		struct mojo_list *l_value;

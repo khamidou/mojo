@@ -60,11 +60,10 @@ int mojo_list_length(struct mojo_list *list)
 	if (list == NULL)
 		return -1;
 
-	struct mojo_list_elem *e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head);
+	struct mojo_list_elem *e;
 	int i = 0;
-	
-	for (i = 0; TAILQ_NEXT(e, mojo_lists) != NULL; i++) {
-		e = TAILQ_NEXT(e, mojo_lists);
+	TAILQ_FOREACH(e, &list->mojo_list_head, mojo_lists) {
+		i++;
 	}
 
 	return i;
@@ -94,15 +93,18 @@ struct Object* create_list_object(void)
 	/* Create a second list object that contains the methods of the list object */
 	struct Object *l1 = (struct Object *) zalloc(sizeof(struct Object));
 
-	if (list_object == NULL)
-		error("Unable to create list object");
+	if (l1 == NULL)
+		error("Unable to create list object at %s %d", __FILE__, __LINE__);
 
 	l1->super = nil_object;
 	l1->type = T_LIST;
 	l1->name = "List";
 	l1->value.l_value = mojo_list_init();
-	
+	l1->methods = l1; /* the methods of l1 are l1 itself - this way we can have infinite recursion */
+
+
 	struct Object *met = zalloc(sizeof(struct Object));
+
 	if (met == NULL)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
@@ -112,6 +114,7 @@ struct Object* create_list_object(void)
 	list_append(l1, met);
 
 	met = zalloc(sizeof(struct Object));
+
 	if (met == NULL)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
@@ -121,6 +124,7 @@ struct Object* create_list_object(void)
 	list_append(l1, met);
 	
 	met = zalloc(sizeof(struct Object));
+
 	if (met == NULL)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
@@ -130,6 +134,7 @@ struct Object* create_list_object(void)
 	list_append(l1, met);
 
 	met = zalloc(sizeof(struct Object));
+
 	if (met == NULL)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
@@ -138,7 +143,7 @@ struct Object* create_list_object(void)
 						   struct Object *arg2))list_last;
 	list_append(l1, met);
 
-	/* TODO: add the builtin methods to the list object */
+	list_object->methods = l1;
 }
 
 struct Object* list_append(struct Object *list, struct Object *o)
@@ -198,10 +203,9 @@ struct Object* list_length(struct Object *list)
 	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
 		return nil_object;
 
-	
 	struct Object *o = clone_object(number_object);
 	if (o == NULL)
-		fail("Unable to clone number_object : %d %d", __FILE__, __LINE__);
+		fail("Unable to clone number_object in %s at line %d", __FILE__, __LINE__);
 
 	o->value.i_value =  mojo_list_length(list->value.l_value);
 

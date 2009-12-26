@@ -41,7 +41,8 @@ struct Object* clone_object(struct Object *o)
 	struct Object *met;
 
 	int i;
-	for (i = 0; i < list_length(o->methods); i++) {
+	
+	for (i = 0; i < mojo_list_length(o->methods->value.l_value); i++) {
 		met = (struct Object *) list_nth(o->methods, i);
 		/* FIXME : Copy the method if it's a block,
 		   	   to be able to free() later.
@@ -56,7 +57,7 @@ struct Object* clone_object(struct Object *o)
 		break;
 
 	case T_LIST:
-		for (i = 0; i < list_length(o); i++) {
+		for (i = 0; i < mojo_list_length(o->value.l_value); i++) {
 			struct Object *t = clone_object((struct Object *) list_nth(o, i));
 			
 			if (t == NULL)
@@ -108,5 +109,4 @@ void init_object_system(void)
 	number_object->type = T_NUMBER;
 	number_object->name = "Number";
 	number_object->value.i_value = 0;
-
 }
