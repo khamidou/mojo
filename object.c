@@ -10,7 +10,7 @@ struct Object* lookup_method(struct Object *o, char *name)
 	struct Object *met;
 	
 	int i;
-	for (i = 0; met != nil_object; i++) {
+	for (i = 0; i < mojo_list_length(o->methods->value.l_value); i++) {
 		met = (struct Object *) list_nth(o->methods, i);
 		if (strcmp(name, met->name) == 0)
 			return met;
@@ -37,6 +37,7 @@ struct Object* clone_object(struct Object *o)
 	new->super = o->super;
 	new->type = o->type;
 	new->name = strndup(o->name, 255); /* FIXME : test the value of strdup */
+	new->methods = create_list_object();
 
 	struct Object *met;
 
@@ -88,7 +89,7 @@ void init_object_system(void)
 	/* We need to create the list object before everything else because it is
 	   needed for the method dictionnaries.
 	 */
-	create_list_object(); 
+	list_object = create_list_object(); 
 
 	/* init nil object */
 	nil_object = new_object();
@@ -96,17 +97,18 @@ void init_object_system(void)
 	nil_object->type = T_NIL;
 	nil_object->name = "nil";
 
-
 	/* init base object */
 	base_object = new_object();
 	base_object->super = nil_object;
 	base_object->type = T_OBJECT;
 	base_object->name = "Object";
-	
-	/* init number object */
-	number_object = new_object();
-	number_object->super = base_object;
-	number_object->type = T_NUMBER;
-	number_object->name = "Number";
-	number_object->value.i_value = 0;
+
+	/* init builtin object */
+	builtin_object = new_object();
+	builtin_object->super = nil_object;
+	builtin_object->type = T_BUILTIN;
+	builtin_object->name = "Builtin";
+
+	create_number_object();
+
 }

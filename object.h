@@ -2,6 +2,7 @@
 #define __MOJO_OBJECT__
 
 #include "queue.h"
+#include "number.h"
 #include "zalloc.h"
 
 /*
@@ -50,6 +51,7 @@ void init_object_system(void);
 
 struct Object *nil_object;
 struct Object *base_object;
+struct Object *builtin_object;
 struct Object *number_object;
 struct Object *list_object;
 

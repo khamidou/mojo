@@ -80,7 +80,7 @@ struct Object* create_list_object(void)
 	/* the rest of the time, this object is cloned */
 
 	/* We can't use new_object because it calls create_list recursively */
-	list_object = (struct Object *) zalloc(sizeof(struct Object));
+	struct Object * list_object = (struct Object *) zalloc(sizeof(struct Object));
 
 	if (list_object == NULL)
 		error("Unable to create list object");
@@ -92,15 +92,18 @@ struct Object* create_list_object(void)
 
 	/* Create a second list object that contains the methods of the list object */
 	struct Object *l1 = (struct Object *) zalloc(sizeof(struct Object));
+	struct Object *l2 = (struct Object *) zalloc(sizeof(struct Object));
 
-	if (l1 == NULL)
+	if (l1 == NULL || l2 == NULL)
 		error("Unable to create list object at %s %d", __FILE__, __LINE__);
 
 	l1->super = nil_object;
 	l1->type = T_LIST;
 	l1->name = "List";
 	l1->value.l_value = mojo_list_init();
-	l1->methods = l1; /* the methods of l1 are l1 itself - this way we can have infinite recursion */
+	l1->methods = nil_object; /* the methods of l1 are in l2, which is an empty list. This way, we don't fall into 
+			     an infinite loop in clone_object()
+			   */
 
 
 	struct Object *met = zalloc(sizeof(struct Object));
@@ -144,6 +147,8 @@ struct Object* create_list_object(void)
 	list_append(l1, met);
 
 	list_object->methods = l1;
+
+	return list_object;
 }
 
 struct Object* list_append(struct Object *list, struct Object *o)
