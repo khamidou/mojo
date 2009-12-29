@@ -1,4 +1,37 @@
-mojo is a smalltalk without smalltalk.
+mojo is a smalltalk without smalltalk. That is, without the cruft that smalltalk accumulated 
+in 30 years of existence, in the hope that it'd easier to grasp.
+
+
+Building
+========
+
+Just type 'make' to build the 'mojo' executable.
+
+Whirlwind tour of the language
+==============================
+
+The language is quite simple : it consists, put simply, of blocks, variable declarations and messages.
+
+# This is a comment
+
+# Declare a variable "x"
+System variables add "x"; 
+
+# Assign a value to x:
+x := 3;
+
+# Send a message to x:
+x + 3;
+
+# Test the value of x, and execute a block it is true
+
+x = 3 ifTrue: [ x y z | # doStuff... ]
+
+Hacking
+=======
+
+mojo is as simple as possible. I'm not an expert in language implementation, but the interpreter loosely
+follows the eval/apply pattern.
 
 Coding conventions
 ==================
