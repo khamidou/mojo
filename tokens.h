@@ -4,6 +4,7 @@
 #define SYMBOL 	0
 #define NUMBER 	1
 #define STRING 	2
+#define COMMA   3
 #define T_EOF	99
 
 #endif

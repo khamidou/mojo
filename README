@@ -24,8 +24,8 @@ x := 3;
 x + 3;
 
 # Test the value of x, and execute a block it is true
-
-x = 3 ifTrue: [ x y z | # doStuff... ]
+# Note that a block doesn't get parameters, only 
+x = 3 ifTrue: [ # doStuff... ]
 
 Hacking
 =======

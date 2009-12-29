@@ -112,8 +112,8 @@ struct Object* create_list_object(void)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
 	met->type = T_BUILTIN;
-	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
-						   struct Object *arg2))list_append;
+	met->name = "+";
+	met->value.c_method = BUILTIN_CAST list_append;
 	list_append(l1, met);
 
 	met = zalloc(sizeof(struct Object));
@@ -122,8 +122,8 @@ struct Object* create_list_object(void)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
 	met->type = T_BUILTIN;
-	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
-						   struct Object *arg2))list_remove;
+	met->name = "remove";
+	met->value.c_method = BUILTIN_CAST list_remove;
 	list_append(l1, met);
 	
 	met = zalloc(sizeof(struct Object));
@@ -132,8 +132,8 @@ struct Object* create_list_object(void)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
 	met->type = T_BUILTIN;
-	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
-						   struct Object *arg2))list_nth;
+	met->name = "nth:";
+	met->value.c_method = BUILTIN_CAST list_nth;
 	list_append(l1, met);
 
 	met = zalloc(sizeof(struct Object));
@@ -142,8 +142,8 @@ struct Object* create_list_object(void)
 		fail("Unable to create a method %d %d", __FILE__, __LINE__);
 
 	met->type = T_BUILTIN;
-	met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
-						   struct Object *arg2))list_last;
+	met->name = "last";
+	met->value.c_method = BUILTIN_CAST list_last;
 	list_append(l1, met);
 
 	list_object->methods = l1;
@@ -153,7 +153,7 @@ struct Object* create_list_object(void)
 
 struct Object* list_append(struct Object *list, struct Object *o)
 {
-	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
 		return nil_object;
 
 	if (o == NULL)
@@ -166,7 +166,7 @@ struct Object* list_append(struct Object *list, struct Object *o)
 
 struct Object* list_remove(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
 		return nil_object;
 
 	mojo_list_remove(list->value.l_value);
@@ -176,7 +176,7 @@ struct Object* list_remove(struct Object *list)
 
 struct Object* list_nth(struct Object *list, int n)
 {
-	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = mojo_list_nth(list->value.l_value, n);
@@ -191,7 +191,7 @@ struct Object* list_nth(struct Object *list, int n)
 
 struct Object* list_last(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = mojo_list_last(list->value.l_value);
@@ -205,7 +205,7 @@ struct Object* list_last(struct Object *list)
 
 struct Object* list_length(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->value.l_value == NULL)
+	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = clone_object(number_object);

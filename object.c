@@ -37,7 +37,7 @@ struct Object* clone_object(struct Object *o)
 	new->super = o->super;
 	new->type = o->type;
 	new->name = strndup(o->name, 255); /* FIXME : test the value of strdup */
-	new->methods = create_list_object();
+	new->methods = (struct Object *) create_list_object();
 
 	struct Object *met;
 
@@ -89,7 +89,7 @@ void init_object_system(void)
 	/* We need to create the list object before everything else because it is
 	   needed for the method dictionnaries.
 	 */
-	list_object = create_list_object(); 
+	list_object = (struct Object *) create_list_object(); 
 
 	/* init nil object */
 	nil_object = new_object();

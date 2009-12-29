@@ -21,6 +21,10 @@ enum o_types {
 
 }; /* the base types */
 
+/* this cast is to silence some warnings sent by the compiler */
+#define BUILTIN_CAST (struct Object * (*)(struct Object *parent, struct Object *arg1,\
+					  struct Object *arg2, struct Object *arg3, struct Object *arg4))
+
 struct Object {
 	struct Object *super;
 	char *name;
@@ -29,12 +33,14 @@ struct Object {
 	union {
 		signed int i_value;
 		char c_value;
-		struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2); 
+		struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2, 
+					    struct Object *arg3, struct Object *arg4); 
 		struct mojo_list *l_value;
 		struct Object *m_block;
 	} value;
 
 	struct Object *methods; /* A list object */
+	struct Object *symtab;  /* The list of symbols defined at this point */
 };
 
 struct Object *lookup_method(struct Object *o, char *name);
