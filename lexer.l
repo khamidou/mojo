@@ -8,7 +8,8 @@
 
 
 [0-9]+		{ return NUMBER; 	}
-";"		{ return COMMA;		}
+;		{ return COMMA;		}
+:=		{ return AFFECTATION;   }
 \"[:alnum:]+\"  { return STRING;	}
-[:alnum:]+	{ return SYMBOL;	}
-<<EOF>>		{ return T_EOF;		}
+[a-zA-Z][a-zA-Z0-9]*	{ return SYMBOL;	}
+<<EOF>>		{ exit(0);}
