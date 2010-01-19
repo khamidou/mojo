@@ -3,6 +3,7 @@
 %}
 
 %option yylineno 
+%s raw
 
 %%
 
@@ -12,4 +13,7 @@
 :=		{ return AFFECTATION;   }
 \"[:alnum:]+\"  { return STRING;	}
 [a-zA-Z][a-zA-Z0-9]*	{ return SYMBOL;	}
-<<EOF>>		{ exit(0);}
+<<EOF>>		{ return; }
+\%\{		{ BEGIN(raw); }
+<raw>\%\}		{ BEGIN(INITIAL); }
+<raw>.+       { printf("%s", yytext); }

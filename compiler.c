@@ -3,7 +3,9 @@
   copyright (c) 2009 karim hamidou.
 
   This is a rough translator for a subset of mojo to C.
-  
+  It does no verifications whatsoever, everything is kept at the sole discretion
+  of the programmer.
+
 */
 
 #include <stdio.h>
@@ -32,6 +34,9 @@ int main(int argc, char **argv)
 	int r;
 	while((r = yylex()) != T_EOF) {
 		switch(r) {
+		case EOF:
+			break;
+
 		case SYMBOL:
 			symbol();
 			break;
@@ -51,8 +56,12 @@ void symbol()
 
 	int r = yylex();
 	switch(r) {
+	case EOF:
+		break;
+
 	case AFFECTATION:
-		printf("struct Object *%s = ", symname);
+		yylex();
+		printf("struct Object *%s = %s;", symname, yytext);
 		break;
 
 	default:
@@ -73,6 +82,10 @@ void symbol()
 
 		while ((r = yylex()) && i < 4) {
 			switch(r) {
+			case EOF:
+				goto loop_exit;
+				break;
+
 			case COMMA:
 				break;
 
@@ -83,6 +96,7 @@ void symbol()
 			i++;
 		} 
 
+	loop_exit:
 		if (i < 4) {
 			  while(i < 3) { 
 				  printf("NULL,");
