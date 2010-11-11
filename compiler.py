@@ -8,9 +8,11 @@ import re
 symtab = {}
 
 class Symbol:
-	def __init__(self, name, value):
+	def __init__(self, name, value=None):
 		self.name = name
 		self.value = value
+	def __repr__(self):
+		return "type: symbol, name: %s, value: %s" % (self.name, self.value)
 class Ast:
 	def __init__(self, type, value):
 		self.type = type
@@ -51,6 +53,7 @@ class Lexer(object):
 def parse(s):	
 	defs = [("lparen", "\("),
 		("rparen", "\)"),
+		("semicolon", ";"),
 		("assignment", ":="),
 		("word", "[a-z]+"),
 		("number", "[0-9]+"),]
@@ -72,8 +75,14 @@ def parse(s):
 
 			if ntok[0] == "assignment":
 				retast.method = ":="
+				sym = Symbol(token[1])
+				symtab[token[1]] = sym
 			elif ntok[0] == "word":
 				retast.method = ntok[1]
+				# Scan the tokens until getting a semicolon
+				retast.params = []
+				while ((ntok = input.next()) != "semicolon")
+					retast.params.append(Ast(ntok[1]))
 			else:
 				error("Invalid token %s near %s" % (ntok[1], token[1]))
 			return retast
@@ -86,11 +95,21 @@ def parse(s):
 	
 	return ast
 
+def compile_ast(ast):
+	# First, output the variable declarations
+	for sym in symtab:
+		print "struct mojo_object *cl_%s;" % sym
+
+	for node in ast:
+		print node.methods
+
 if __name__ == "__main__":
 	if len(sys.argv) != 2:
 		print "%s file.mj" % sys.argv[0]
 		sys.exit(0)
 
-	print parse(read_file(sys.argv[1]))
+	ast = parse(read_file(sys.argv[1]))
+	print ast
+	compile_ast(ast)
 
 

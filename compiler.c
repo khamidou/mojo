@@ -65,6 +65,7 @@ void symbol()
 		break;
 
 	default:
+		printf ("------ %s -----", yytext);
 		/* method call, like Lexer yylex; */
 		puts("{"); /* put it in a block, to not disrupt other declarations */
 
