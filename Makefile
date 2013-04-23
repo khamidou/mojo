@@ -1,5 +1,5 @@
 CFLAGS=-c -g
-OBJS=lex.yy.o object.o list.o error.o number.o compiler.o
+OBJS=lex.yy.o object.o list.o error.o number.o main.o interp.o
 
 mojo: $(OBJS)
 	cc -o mojo $(OBJS) -lfl 
@@ -9,8 +9,9 @@ lex.yy.o: lexer.l
 	cc $(CFLAGS) lex.yy.c
 
 object.o: object.h object.c
-compiler.o: compiler.c compiler.h
+main.o: main.c
 list.o: list.c
+interp.o: interp.c
 number.o: number.c number.h
 error.o: error.h error.c
 

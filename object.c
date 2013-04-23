@@ -58,6 +58,7 @@ struct Object* clone_object(struct Object *o)
 		break;
 
 	case T_LIST:
+        new->value.l_value = mojo_list_init();
 		for (i = 0; i < mojo_list_length(o->value.l_value); i++) {
 			struct Object *t = clone_object((struct Object *) list_nth(o, i));
 			

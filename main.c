@@ -5,6 +5,6 @@
 main() {
 
 	init_object_system();
-	eval_image(stdin);
+	compile_image(stdin);
 
 }

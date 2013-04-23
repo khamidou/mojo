@@ -1,6 +1,7 @@
 #ifndef __MOJO_OBJECT__
 #define __MOJO_OBJECT__
 
+#include <string.h>
 #include "queue.h"
 #include "number.h"
 #include "zalloc.h"
@@ -18,6 +19,7 @@ enum o_types {
 	T_OBJECT, 
 	T_BUILTIN,
 	T_BLOCK,
+    T_MESSAGE,
 
 }; /* the base types */
 

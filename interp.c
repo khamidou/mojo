@@ -17,17 +17,55 @@ struct Object *apply_block(struct Object *o)
 	}
 }
 
-int eval_image(FILE *fp)
+int compile_image(FILE *fp)
 {
-	struct Object* stack = clone_object(list_object);
-	int r;
-	while((r = yylex()) != T_EOF) {
-		switch(r) {
-		case NUMBER:
-		{
-		}
-		default:
-			break;
-		}
-	}
+	struct Object* ast = clone_object(list_object);
+    expression(ast);
+    display_ast(ast);
+}
+
+int expression(struct Object *ast) {
+
+	int r = yylex();
+    switch(r) {
+        case NUMBER:
+            puts("number here bro");
+            struct Object* obj = clone_object(number_object);
+            list_append(ast, obj);
+            return message(ast);
+            break;
+        default:
+            fail("Unexpected : %s", yytext);
+            break;
+    }
+}
+
+int message(struct Object *ast) {
+    int r = yylex();
+    switch(r) {
+        case SYMBOL:
+            printf("message : %s\n", yytext);
+            struct Object* obj = clone_object(base_object);
+            obj->type = T_MESSAGE;
+            obj->name = strdup(yytext);
+            list_append(ast, obj);
+            expression(ast);
+            break;
+
+        case SEMICOLON:
+            return 0;
+            break;
+
+        default:
+            fail("Expected symbol, got : %s", yytext);
+            break;
+    }
+
+}
+
+void display_ast(struct Object *ast) {
+    
+    int length = mojo_list_length(ast->value.l_value);
+    
+    printf("ast->value.lv: %x, ast len: %d\n", ast->value.l_value, length);
 }

@@ -9,7 +9,7 @@
 
 
 [0-9]+		{ return NUMBER; 	}
-;		{ return COMMA;		}
+;		{ return SEMICOLON;		}
 :=		{ return AFFECTATION;   }
 \"[:alnum:]+\"  { return STRING;	}
 [a-zA-Z][a-zA-Z0-9]*	{ return SYMBOL;	}

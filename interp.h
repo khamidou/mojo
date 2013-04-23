@@ -3,6 +3,6 @@
 
 #include <stdio.h>
 
-int eval_image(FILE *fp);
+int compile_image(FILE *fp);
 
 #endif
