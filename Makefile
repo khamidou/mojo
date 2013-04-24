@@ -17,7 +17,6 @@ error.o: error.h error.c
 
 clean:
 	rm *.o
-	rm *~
 
 count:
 	wc -l `ls *.[chl] -1 | grep -v lex.yy.c | grep -v queue`

@@ -153,12 +153,13 @@ struct Object* create_list_object(void)
 
 struct Object* list_append(struct Object *list, struct Object *o)
 {
-	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
+	if (list == NULL || (list->type != T_LIST && list->type != T_BLOCK) || list->value.l_value == NULL) {
 		return nil_object;
+    }
 
-	if (o == NULL)
+	if (o == NULL) {
 		return NULL;
-
+    }
 	mojo_list_append(list->value.l_value, o);
 
 	return o;
@@ -166,7 +167,7 @@ struct Object* list_append(struct Object *list, struct Object *o)
 
 struct Object* list_remove(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
+	if (list == NULL || (list->type != T_LIST && list->type != T_BLOCK) || list->value.l_value == NULL)
 		return nil_object;
 
 	mojo_list_remove(list->value.l_value);
@@ -176,7 +177,7 @@ struct Object* list_remove(struct Object *list)
 
 struct Object* list_nth(struct Object *list, int n)
 {
-	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
+	if (list == NULL || (list->type != T_LIST && list->type != T_BLOCK) || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = mojo_list_nth(list->value.l_value, n);
@@ -191,7 +192,7 @@ struct Object* list_nth(struct Object *list, int n)
 
 struct Object* list_last(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
+	if (list == NULL || (list->type != T_LIST && list->type != T_BLOCK) || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = mojo_list_last(list->value.l_value);
@@ -205,7 +206,7 @@ struct Object* list_last(struct Object *list)
 
 struct Object* list_length(struct Object *list)
 {
-	if (list == NULL || list->type != T_LIST || list->type != T_BLOCK || list->value.l_value == NULL)
+	if (list == NULL || (list->type != T_LIST && list->type != T_BLOCK) || list->value.l_value == NULL)
 		return nil_object;
 
 	struct Object *o = clone_object(number_object);

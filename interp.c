@@ -27,10 +27,10 @@ int compile_image(FILE *fp)
 int expression(struct Object *ast) {
 
 	int r = yylex();
+    struct Object *obj;
     switch(r) {
         case NUMBER:
-            puts("number here bro");
-            struct Object* obj = clone_object(number_object);
+            obj = clone_object(number_object);
             list_append(ast, obj);
             return message(ast);
             break;
@@ -42,10 +42,10 @@ int expression(struct Object *ast) {
 
 int message(struct Object *ast) {
     int r = yylex();
+    struct Object *obj;
     switch(r) {
         case SYMBOL:
-            printf("message : %s\n", yytext);
-            struct Object* obj = clone_object(base_object);
+            obj = clone_object(base_object);
             obj->type = T_MESSAGE;
             obj->name = strdup(yytext);
             list_append(ast, obj);
@@ -67,5 +67,14 @@ void display_ast(struct Object *ast) {
     
     int length = mojo_list_length(ast->value.l_value);
     
-    printf("ast->value.lv: %x, ast len: %d\n", ast->value.l_value, length);
+    printf("ast len: %d\n", length);
+    int i = 0;
+    for(i = 0; i < length; i++) {
+        struct Object *o = list_nth(ast, i);
+        printf("type: %d name: %s\n", o->type, o->name);
+    }
+}
+
+void execute(struct Object *ast) {
+
 }
