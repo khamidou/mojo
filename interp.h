@@ -4,5 +4,7 @@
 #include <stdio.h>
 
 int compile_image(FILE *fp);
+void display_object(struct Object *obj);
+void execute(struct Object *ast);
 
 #endif

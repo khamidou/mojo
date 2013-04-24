@@ -40,7 +40,7 @@ void create_number_object(void)
 	number_object->value.i_value = 0;
 	
 	struct Object *plus_met = clone_object(builtin_object);
-	plus_met->name = "+";
+	plus_met->name = "plus";
 	plus_met->value.c_method = (struct Object * (*)(struct Object *parent, struct Object *arg1, 
 						   struct Object *arg2))num_plus;
 

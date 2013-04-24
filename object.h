@@ -20,6 +20,7 @@ enum o_types {
 	T_BUILTIN,
 	T_BLOCK,
     T_MESSAGE,
+    T_SEPARATOR, /* ugly - used by the interpretor to separate statements in the AST */
 
 }; /* the base types */
 

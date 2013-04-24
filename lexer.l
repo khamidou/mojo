@@ -12,7 +12,7 @@
 ;		{ return SEMICOLON;		}
 :=		{ return AFFECTATION;   }
 \"[:alnum:]+\"  { return STRING;	}
-[a-zA-Z][a-zA-Z0-9]*	{ return SYMBOL;	}
+[a-zA-Z\+\-][a-zA-Z0-9]*	{ return SYMBOL;	}
 <<EOF>>		{ return; }
 \%\{		{ BEGIN(raw); }
 <raw>\%\}		{ BEGIN(INITIAL); }
