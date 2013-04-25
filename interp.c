@@ -79,7 +79,7 @@ void display_ast(struct Object *ast) {
     int i = 0;
     for(i = 0; i < length; i++) {
         struct Object *o = list_nth(ast, i);
-        printf("type: %d name: %s\n", o->type, o->name);
+        display_object(o);
     }
 }
 
@@ -94,17 +94,31 @@ void execute(struct Object *ast) {
     for(i = 0; i < length; i++) {
         struct Object *statement_list = (struct Object*) list_nth(ast, i);
         
-        int length = mojo_list_length(statement_list->value.l_value);
-        struct Object *destObject = (struct Object*) list_nth(statement_list, 0);
-        struct Object *message = (struct Object*) list_nth(statement_list, 1);
-        struct Object *arg1 = (struct Object*) list_nth(statement_list, 2);
+        int statement_length = mojo_list_length(statement_list->value.l_value);
+        int j = 0;
         
-        struct Object *method = (struct Object*) lookup_method(destObject, message->name);
-        if(method == nil_object) {
-            fail("error : method %s not found in object %s", message->name, destObject->name);
-        }
+        // returnValue holds the result of the evaluation of an expression
+        struct Object *returnValue = (struct Object*) list_nth(statement_list, statement_length - 1);
+        struct Object *destObject, *method;
+        for(j = statement_length - 2; j >= 0; j--) {
+            struct Object *obj = (struct Object*) list_nth(statement_list, j);
+            switch(obj->type) {
+                case T_MESSAGE:
+                    if (j - 1 > 0) { // guard
+                        destObject = (struct Object*) list_nth(statement_list, j - 1);
+                        method = (struct Object*) lookup_method(destObject, obj->name);
+                        if(method == nil_object) {
+                            fail("error : method %s not found in object %s", obj->name, destObject->name);
+                        }
 
-        struct Object *ret = method->value.c_method(destObject, arg1, NULL, NULL, NULL);
-        printf("value %d", ret->value.i_value);
+                        returnValue = method->value.c_method(destObject, returnValue, NULL, NULL, NULL);
+                    }
+
+                    break;
+            }
+
+
+        }
+       printf("value %d", returnValue->value.i_value);
     }
 }
