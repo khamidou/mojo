@@ -1,3 +1,15 @@
+/**
+ * a short explanation of the abstract syntax tree used mojo :
+ * in short, the code is parsed and is transformed in a bunch of
+ * s-expressions.
+ *
+ * For instance, the following code :
+ * MyClass :setValue o :setPosx 3 becomes :
+ * (MyClass
+ *          (:setValue o
+ *              (: setPosx 3)))
+ */
+
 #include "object.h"
 #include "interp.h"
 #include "tokens.h"
@@ -5,38 +17,32 @@
 extern int yylex();
 extern char *yytext;
 
-struct Object *apply_block(struct Object *o)
-{
-	if (o == NULL || o->type != T_BLOCK)
-		return NULL;
-
-	int i = 0;
-	for (i = 0; i < list_length(o); i++) {
-		
-		
-	}
-}
-
 int compile_image(FILE *fp)
 {
 	struct Object* ast = clone_object(list_object);
-	struct Object* first_leaf = clone_object(list_object);
-    list_append(ast, first_leaf);
     
-    expression(first_leaf);
-    execute(ast);
+    expression(ast);
+    display_ast(ast, 0);
+    puts(">>> AST <<<");
+
+    struct Object *returnValue = execute_branch(ast);
+    printf("Value : %d", returnValue->value.i_value);
 }
 
 int expression(struct Object *ast) {
 
 	int r = yylex();
     struct Object *obj;
+	struct Object *params;
     switch(r) {
         case NUMBER:
             obj = clone_object(number_object);
             obj->value.i_value = atoi(yytext);
-            list_append(ast, obj);
-            return message(ast);
+            params = clone_object(list_object);
+            list_append(params, obj);
+            list_append(ast, params);
+
+            return message(params);
             break;
         default:
             fail("Unexpected : %s", yytext);
@@ -47,6 +53,7 @@ int expression(struct Object *ast) {
 int message(struct Object *ast) {
     int r = yylex();
     struct Object *obj;
+
     switch(r) {
         case SYMBOL:
             obj = clone_object(base_object);
@@ -57,10 +64,6 @@ int message(struct Object *ast) {
             break;
 
         case SEMICOLON:
-            obj = clone_object(base_object);
-            obj->type = T_SEPARATOR;
-            obj->name = "Separator";
-            list_append(ast, obj);
             return 0;
             break;
 
@@ -71,20 +74,35 @@ int message(struct Object *ast) {
 
 }
 
-void display_ast(struct Object *ast) {
-    
+void display_ast(struct Object *ast, int nindents) {
+    if (ast == NULL)
+        return;
+
+    if (ast->type != T_LIST) {
+        display_object(ast, nindents);
+        return;
+    }
+
     int length = mojo_list_length(ast->value.l_value);
     
-    printf("ast len: %d\n", length);
     int i = 0;
     for(i = 0; i < length; i++) {
         struct Object *o = list_nth(ast, i);
-        display_object(o);
+        display_object(o, nindents);
     }
 }
 
-void display_object(struct Object *obj) {
-        printf("type: %d name: %s\n", obj->type, obj->name);
+void display_object(struct Object *obj, int nindents) {
+
+        int i = 0;
+        for (i = 0; i < nindents; i++)
+            putc(' ', stdout);
+
+        printf("class: %s\n", obj->name);
+
+        if(obj->type == T_LIST) {
+            display_ast(obj, nindents + 4);
+        }
 }
 
 void execute(struct Object *ast) {
@@ -121,4 +139,62 @@ void execute(struct Object *ast) {
         }
        printf("value %d", returnValue->value.i_value);
     }
+}
+
+struct Object* execute_branch(struct Object *ast) {
+    if (ast == NULL || ast->type != T_LIST) 
+        return;
+
+
+	struct Object* stack = clone_object(list_object);
+
+    int length = mojo_list_length(ast->value.l_value);
+    if (length == 0)
+        return;
+
+
+    // first, execute all the sub-expressions
+    int i = 0;
+    for (i = 0; i < length; i++) {
+            struct Object *obj = (struct Object*) list_nth(ast, i);
+            if(obj == NULL)
+                continue;
+
+            if(obj->type == T_LIST) {
+                list_append(stack, execute_branch(obj));
+            } else {
+                list_append(stack, obj);
+            }
+    }
+
+    // now execute the expression itself
+    
+    length = mojo_list_length(ast->value.l_value);
+    if (length == 0) {
+        return nil_object;
+    } else if (length == 1) {
+        return list_nth(stack, 1);
+    } else if (length > 1) {
+        struct Object *destObject = list_nth(stack, 0);
+        struct Object *methodName = list_nth(stack, 1);
+
+        struct Object *method = (struct Object*) lookup_method(destObject, methodName->name);
+        if(method == nil_object) {
+                        fail("error : method %s not found in object %s", methodName->name, destObject->name);
+        }
+
+
+        /* we use the fact that if list_nth doesn't find an
+         * object because it doesn't exists at the index, it returns nil
+         */ 
+        struct Object *param1 = list_nth(stack, 2), 
+                      *param2 = list_nth(stack, 3),
+                      *param3 = list_nth(stack, 4), 
+                      *param4 = list_nth(stack, 5);
+
+        destObject = method->value.c_method(destObject, param1, param2, param3, param4);
+        return destObject;
+    }
+
+    return nil_object;
 }
