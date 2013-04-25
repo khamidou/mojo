@@ -1,5 +1,7 @@
-mojo is a smalltalk without smalltalk. That is, without the cruft that smalltalk accumulated 
-in 30 years of existence, in the hope that it'd be easier to grasp.
+mojo is an object language which is influenced by in a lot of ways by
+io and smalltalk. I originally started it because I wanted to understand
+smalltalk, but I felt squeak a little too weird to spend time in it - I
+guess you can call it a pretty serious case of NIH.
 
 
 Building
@@ -13,9 +15,6 @@ Whirlwind tour of the language
 The language is quite simple : it consists, put simply, of blocks, variable declarations and messages.
 
 # This is a comment
-
-# Declare a variable "x"
-System variables add "x"; 
 
 # Assign a value to x:
 x := 3;
