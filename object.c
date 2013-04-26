@@ -58,7 +58,7 @@ struct Object* clone_object(struct Object *o)
 		break;
 
 	case T_LIST:
-        new->value.l_value = mojo_list_init();
+        new->value.l_value = (struct mojo_list *) mojo_list_init();
 		for (i = 0; i < mojo_list_length(o->value.l_value); i++) {
 			struct Object *t = clone_object((struct Object *) list_nth(o, i));
 			
@@ -79,7 +79,20 @@ void free_object(struct Object *o)
 	if (o == NULL)
 		return;
 
+    /*
+     * FIXME: use our own lib for strings and don't use
+     * BSS strings which can't be freed.
 	free(o->name);
+    */
+    if (o->methods != NULL)
+        free_object(o->methods);
+
+    if (o->symtab != NULL)
+        free_object(o->symtab);
+
+    if (o->type == T_LIST && o->value.l_value != NULL) {
+        mojo_list_free(o->value.l_value);
+    }
 
 	/* FIXME : free : the methods list, the methods and finally the object */
 	free(o);

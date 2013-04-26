@@ -193,6 +193,10 @@ struct Object* execute_branch(struct Object *ast) {
                       *param4 = list_nth(stack, 5);
 
         destObject = method->value.c_method(destObject, param1, param2, param3, param4);
+
+        // free the stack and the ast
+        free_object(ast);
+        free_object(stack);
         return destObject;
     }
 
