@@ -76,7 +76,7 @@ struct Object* clone_object(struct Object *o)
 
 void free_object(struct Object *o)
 {
-	if (o == NULL)
+	if (o == NULL || o == nil_object || o == base_object || o == number_object)
 		return;
 
     /*
@@ -94,7 +94,6 @@ void free_object(struct Object *o)
         mojo_list_free(o->value.l_value);
     }
 
-	/* FIXME : free : the methods list, the methods and finally the object */
 	free(o);
 }
 

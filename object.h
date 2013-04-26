@@ -39,7 +39,9 @@ struct Object {
 		struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2, 
 					    struct Object *arg3, struct Object *arg4); 
 		struct mojo_list *l_value;
+        struct mojo_string *s_value;
 		struct Object *m_block;
+        struct Object *v_value; /* the value pointed to by a variable */
 	} value;
 
 	struct Object *methods; /* A list object */
