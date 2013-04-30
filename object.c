@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "object.h"
+#include "list.h"
+#include "error.h"
 
 struct Object* lookup_method(struct Object *o, char *name)
 {
@@ -10,10 +12,28 @@ struct Object* lookup_method(struct Object *o, char *name)
 	struct Object *met;
 	
 	int i;
-	for (i = 0; i < mojo_list_length(o->methods->value.l_value); i++) {
-		met = (struct Object *) list_nth(o->methods, i);
-		if (strcmp(name, met->name) == 0)
-			return met;
+    if (o->methods != NULL && o->methods->value.l_value != NULL)
+        for (i = 0; i < mojo_list_length(o->methods->value.l_value); i++) {
+            met = (struct Object *) list_nth(o->methods, i);
+            if (strcmp(name, met->name) == 0)
+                return met;
+        }
+
+	return nil_object;
+}
+
+struct Object* lookup_variable(struct Object *scope, char *name)
+{
+	if (name == NULL || scope == NULL)
+		return NULL;
+
+	struct Object *var;
+	
+	int i;
+	for (i = 0; i < mojo_list_length(scope->symtab->value.l_value); i++) {
+		var = (struct Object *) list_nth(scope->symtab, i);
+		if (strcmp(name, var->name) == 0)
+			return var;
 	}
 
 	return nil_object;
@@ -38,6 +58,7 @@ struct Object* clone_object(struct Object *o)
 	new->type = o->type;
 	new->name = strndup(o->name, 255); /* FIXME : test the value of strdup */
 	new->methods = (struct Object *) create_list_object();
+	new->symtab = (struct Object *) create_list_object();
 
 	struct Object *met;
 
@@ -69,21 +90,29 @@ struct Object* clone_object(struct Object *o)
 		}
 		break;
 
-		
+	default:
+        break;	
 	}
 	return new;
 }
 
 void free_object(struct Object *o)
 {
-	if (o == NULL || o == nil_object || o == base_object || o == number_object)
+	if (o == NULL || o == nil_object || o == base_object || o == number_object || o == list_object)
 		return;
 
     /*
+    if (o->type == T_BUILTIN)
+        // don't free builtin methods
+        return;
+    */
+    /*
      * FIXME: use our own lib for strings and don't use
      * BSS strings which can't be freed.
-	free(o->name);
     */
+
+	free(o->name);
+
     if (o->methods != NULL)
         free_object(o->methods);
 
@@ -95,6 +124,14 @@ void free_object(struct Object *o)
     }
 
 	free(o);
+}
+
+void create_base_object(void) {
+	/* init base object */
+	base_object = new_object();
+	base_object->super = nil_object;
+	base_object->type = T_OBJECT;
+	base_object->name = "Object";
 }
 
 void init_object_system(void)
@@ -110,11 +147,7 @@ void init_object_system(void)
 	nil_object->type = T_NIL;
 	nil_object->name = "nil";
 
-	/* init base object */
-	base_object = new_object();
-	base_object->super = nil_object;
-	base_object->type = T_OBJECT;
-	base_object->name = "Object";
+    create_base_object();
 
 	/* init builtin object */
 	builtin_object = new_object();

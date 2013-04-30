@@ -76,10 +76,18 @@ void mojo_list_free(struct mojo_list *list) {
 	if (list == NULL)
 		return;
 
+    //printf("len : %d\n", mojo_list_length(list));
+    /*
+    while(mojo_list_length(list) > 0)
+        mojo_list_remove(list);
+
+    free(list);
+    */
     struct mojo_list_elem *e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head);
 
 	TAILQ_FOREACH(e, &list->mojo_list_head, mojo_lists) {
 	    TAILQ_REMOVE(&list->mojo_list_head, e, mojo_lists);
+        //display_object(e->obj, 0);
         free_object(e->obj);
         free(e);
 	}
@@ -99,7 +107,7 @@ struct Object* create_list_object(void)
 	struct Object * list_object = (struct Object *) zalloc(sizeof(struct Object));
 
 	if (list_object == NULL)
-		error("Unable to create list object");
+		fail("Unable to create list object");
 
 	list_object->super = nil_object;
 	list_object->type = T_LIST;
@@ -111,7 +119,7 @@ struct Object* create_list_object(void)
 	struct Object *l2 = (struct Object *) zalloc(sizeof(struct Object));
 
 	if (l1 == NULL || l2 == NULL)
-		error("Unable to create list object at %s %d", __FILE__, __LINE__);
+		fail("Unable to create list object at %s %d", __FILE__, __LINE__);
 
 	l1->super = nil_object;
 	l1->type = T_LIST;

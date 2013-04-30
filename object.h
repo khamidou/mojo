@@ -14,6 +14,7 @@ enum o_types {
 	T_NIL,
 	T_BOOL,
 	T_NUMBER,
+    T_SYMBOL,
 	T_LIST,
 	T_STRING,
 	T_OBJECT, 
@@ -41,7 +42,7 @@ struct Object {
 		struct mojo_list *l_value;
         struct mojo_string *s_value;
 		struct Object *m_block;
-        struct Object *v_value; /* the value pointed to by a variable */
+        struct Object *v_value; /* the value pointed to by a symbol */
 	} value;
 
 	struct Object *methods; /* A list object */
@@ -49,6 +50,7 @@ struct Object {
 };
 
 struct Object *lookup_method(struct Object *o, char *name);
+struct Object* lookup_variable(struct Object *scope, char *name);
 struct Object *new_object(void);
 struct Object *clone_object(struct Object *o);
 void free_object(struct Object *o);
