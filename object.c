@@ -121,7 +121,9 @@ void free_object(struct Object *o)
 
     if (o->type == T_LIST && o->value.l_value != NULL) {
         mojo_list_free(o->value.l_value);
+        free(o->value.l_value);
     }
+
 
 	free(o);
 }

@@ -26,8 +26,8 @@ int compile_image(FILE *fp)
 {
    
     while(!feof(fp)) {
-        struct Object* ast = clone_object(list_object);
-        struct Object* scope = clone_object(list_object);
+        struct Object* ast = create_list_object(); // clone_object(list_object);
+        struct Object* scope = create_list_object(); //clone_object(list_object);
      
         expression(ast);
         display_ast(ast, 0);
