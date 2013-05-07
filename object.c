@@ -96,16 +96,82 @@ struct Object* clone_object(struct Object *o)
 	return new;
 }
 
+const char *type_to_string(enum o_types e)
+{
+    switch(e) {
+        case T_NIL:
+            return "Nil";
+            break;
+
+        case T_BOOL:
+            return "Boolean";
+            break;
+
+        case T_NUMBER:
+            return "Number";
+            break;
+
+        case T_SYMBOL:
+            return "Symbol";
+            break;
+
+        case T_LIST:
+            return "List";
+            break;
+
+        case T_STRING:
+            return "String";
+            break;
+
+        case T_OBJECT:
+            return "Object";
+            break;
+
+        case T_BUILTIN:
+            return "Builtin function";
+            break;
+
+        case T_BLOCK:
+            return "Block";
+            break;
+
+        case T_MESSAGE:
+            return "Message";
+            break;
+
+        case T_SEPARATOR:
+            return "Separator";
+            break;
+
+        default:
+            return "Unknkown object";
+            break;
+    }
+}
+
+void display_object(struct Object *obj, int nindents) {
+
+        int i = 0;
+        for (i = 0; i < nindents; i++)
+            putc(' ', stdout);
+
+        printf("class: %s, type: %s\n", obj->name, type_to_string(obj->type));
+
+        if(obj->type == T_LIST) {
+            display_ast(obj, nindents + 4);
+        }
+}
+
+
 void free_object(struct Object *o)
 {
 	if (o == NULL || o == nil_object || o == base_object || o == number_object || o == list_object)
 		return;
 
-    /*
+    // display_object(o, 0);
     if (o->type == T_BUILTIN)
         // don't free builtin methods
         return;
-    */
     /*
      * FIXME: use our own lib for strings and don't use
      * BSS strings which can't be freed.

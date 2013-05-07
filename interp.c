@@ -116,72 +116,6 @@ void display_ast(struct Object *ast, int nindents) {
     }
 }
 
-const char *type_to_string(enum o_types e)
-{
-    switch(e) {
-        case T_NIL:
-            return "Nil";
-            break;
-
-        case T_BOOL:
-            return "Boolean";
-            break;
-
-        case T_NUMBER:
-            return "Number";
-            break;
-
-        case T_SYMBOL:
-            return "Symbol";
-            break;
-
-        case T_LIST:
-            return "List";
-            break;
-
-        case T_STRING:
-            return "String";
-            break;
-
-        case T_OBJECT:
-            return "Object";
-            break;
-
-        case T_BUILTIN:
-            return "Builtin function";
-            break;
-
-        case T_BLOCK:
-            return "Block";
-            break;
-
-        case T_MESSAGE:
-            return "Message";
-            break;
-
-        case T_SEPARATOR:
-            return "Separator";
-            break;
-
-        default:
-            return "Unknkown object";
-            break;
-    }
-}
-
-void display_object(struct Object *obj, int nindents) {
-
-        int i = 0;
-        for (i = 0; i < nindents; i++)
-            putc(' ', stdout);
-
-        printf("class: %s, type: %s\n", obj->name, type_to_string(obj->type));
-
-        if(obj->type == T_LIST) {
-            display_ast(obj, nindents + 4);
-        }
-}
-
 struct Object* execute_branch(struct Object *ast, struct Object *scope) {
     if (ast == NULL || ast->type != T_LIST) 
         return NULL;
@@ -256,6 +190,7 @@ struct Object* execute_branch(struct Object *ast, struct Object *scope) {
         }
 
         puts("freeing stuff");
+        display_object(stack, 0);
         free_object(stack);
 
         return destObject;

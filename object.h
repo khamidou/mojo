@@ -53,6 +53,7 @@ struct Object *lookup_method(struct Object *o, char *name);
 struct Object* lookup_variable(struct Object *scope, char *name);
 struct Object *new_object(void);
 struct Object *clone_object(struct Object *o);
+void display_object(struct Object *obj, int nindents);
 void free_object(struct Object *o);
 
 struct Method *add_method(struct Object *o, struct Object * (*c_method)(struct Object *parent, struct Object *arg1, struct Object *arg2),
