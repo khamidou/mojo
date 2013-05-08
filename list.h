@@ -4,6 +4,7 @@
 #include "object.h"
 #include "queue.h"
 
+/* see http://blog.jasonish.org/2006/08/tailq-example.html for help on bsd tail queues */
 struct mojo_list_elem {
 	struct Object *obj;
 	TAILQ_ENTRY(mojo_list_elem) mojo_lists;

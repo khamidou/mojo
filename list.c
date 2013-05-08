@@ -83,14 +83,17 @@ void mojo_list_free(struct mojo_list *list) {
 
     free(list);
     */
-    struct mojo_list_elem *e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head);
 
-	TAILQ_FOREACH(e, &list->mojo_list_head, mojo_lists) {
-	    TAILQ_REMOVE(&list->mojo_list_head, e, mojo_lists);
-        //display_object(e->obj, 0);
-        free_object(e->obj);
+    struct mojo_list_elem *e;    
+    while (e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head)) {
+        TAILQ_REMOVE(&list->mojo_list_head, e, mojo_lists);
+
+        if (e->obj != NULL)
+            free_object(e->obj);
+
         free(e);
-	}
+    }
+
 }
 
 /*
