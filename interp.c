@@ -191,6 +191,7 @@ struct Object* execute_branch(struct Object *ast, struct Object *scope) {
 
         puts("freeing stuff");
         display_object(stack, 0);
+        printf(">>> stack  len : %d addr : %x\n", mojo_list_length(stack->value.l_value), stack->value.l_value);
         free_object(stack);
 
         return destObject;

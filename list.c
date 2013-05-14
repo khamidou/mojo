@@ -85,6 +85,8 @@ void mojo_list_free(struct mojo_list *list) {
     */
 
     struct mojo_list_elem *e;    
+    int count = 0;
+    printf(">>> list len : %d, addr: %x\n", mojo_list_length(list), list);
     while (e = (struct mojo_list_elem *) TAILQ_FIRST(&list->mojo_list_head)) {
         TAILQ_REMOVE(&list->mojo_list_head, e, mojo_lists);
 
@@ -92,8 +94,9 @@ void mojo_list_free(struct mojo_list *list) {
             free_object(e->obj);
 
         free(e);
+        count++;
+        printf("count : %d\n", count);
     }
-
 }
 
 /*

@@ -1,4 +1,4 @@
-CFLAGS=-c -g -Wall
+CFLAGS=-c -g3 -Wall
 OBJS=lex.yy.o object.o list.o error.o number.o main.o interp.o
 
 mojo: $(OBJS)
