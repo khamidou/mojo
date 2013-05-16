@@ -1,6 +1,2 @@
-%{
-	/* Everything is supposed to be under control */
-%}
-z := truc
-s := 3
-Lexer yylex;
+2 + 2 ;
+2 + 2 ;

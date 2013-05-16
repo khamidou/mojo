@@ -22,10 +22,10 @@ extern int yyleng;
 extern FILE *yyin;
 extern char *yytext;
 
-int compile_image(FILE *fp)
+int compile_image()
 {
    
-    while(!feof(fp)) {
+    while(!feof(yyin)) {
         struct Object* ast = create_list_object(); // clone_object(list_object);
         struct Object* scope = create_list_object(); //clone_object(list_object);
      

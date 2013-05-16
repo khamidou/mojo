@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-int compile_image(FILE *fp);
+int compile_image();
 void execute(struct Object *ast);
 struct Object* execute_branch(struct Object *ast, struct Object *scope);
 
